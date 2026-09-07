@@ -1,82 +1,42 @@
-import requests
-from urllib.parse import quote
+from providers.tsetmc_provider import TSETMCProvider
 
 
-BASE_URL = "https://cdn.tsetmc.com/api"
+provider = TSETMCProvider()
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-}
+symbol = "فملی"
 
+print(f"Searching for: {symbol}")
 
-def search_symbol(symbol: str):
-    url = f"{BASE_URL}/Instrument/GetInstrumentSearch/{quote(symbol)}"
+results = provider.search_symbol(symbol)
 
-    response = requests.get(
-        url,
-        headers=HEADERS,
-        timeout=20
+if not results:
+    print("Symbol not found.")
+    raise SystemExit(1)
+
+print("\nSearch results:")
+
+for item in results[:5]:
+    print(
+        item.get("lVal18AFC"),
+        "|",
+        item.get("lVal30"),
+        "|",
+        item.get("insCode")
     )
 
-    response.raise_for_status()
+instrument = results[0]
 
-    data = response.json()
+ins_code = instrument["insCode"]
 
-    return data.get("instrumentSearch", [])
+print("\nSelected instrument:")
+print("Symbol:", instrument.get("lVal18AFC"))
+print("Name:", instrument.get("lVal30"))
+print("InsCode:", ins_code)
 
+history = provider.get_history(ins_code)
 
-def get_history(ins_code: str):
-    url = f"{BASE_URL}/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0"
+print("\nHistory records:", len(history))
 
-    response = requests.get(
-        url,
-        headers=HEADERS,
-        timeout=20
-    )
-
-    response.raise_for_status()
-
-    data = response.json()
-
-    return data.get("closingPriceDaily", [])
-
-
-if __name__ == "__main__":
-
-    symbol = "فملی"
-
-    print(f"Searching for: {symbol}")
-
-    results = search_symbol(symbol)
-
-    if not results:
-        print("Symbol not found.")
-        exit(1)
-
-    print("\nSearch results:")
-
-    for item in results[:5]:
-        print(
-            item.get("lVal18AFC"),
-            "|",
-            item.get("lVal30"),
-            "|",
-            item.get("insCode")
-        )
-
-    instrument = results[0]
-
-    ins_code = instrument["insCode"]
-
-    print("\nSelected instrument:")
-    print("Symbol:", instrument.get("lVal18AFC"))
-    print("Name:", instrument.get("lVal30"))
-    print("InsCode:", ins_code)
-
-    history = get_history(ins_code)
-
-    print("\nHistory records:", len(history))
-
-    if history:
-        print("\nFirst record:")
-        print(history[0])
+if history:
+    print("\nFirst record:")
+    print(history[0])
