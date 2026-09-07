@@ -1,0 +1,47 @@
+name: Test TSETMC Network
+
+on:
+  workflow_dispatch:
+
+jobs:
+  network-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Test general internet
+        run: |
+          echo "=== General Internet ==="
+          curl -I --max-time 15 https://www.google.com || true
+
+      - name: Test TSETMC CDN
+        run: |
+          echo "=== TSETMC CDN ==="
+          curl -I --max-time 20 https://cdn.tsetmc.com || true
+
+      - name: Test TSETMC Search API
+        run: |
+          echo "=== TSETMC Search API ==="
+          curl -L \
+            --max-time 30 \
+            -A "Mozilla/5.0" \
+            "https://cdn.tsetmc.com/api/Instrument/GetInstrumentSearch/%D9%81%D9%85%D9%84%DB%8C" \
+            -o /tmp/tsetmc_search.json \
+            -w "\nHTTP_STATUS=%{http_code}\nTIME=%{time_total}\n" \
+            || true
+
+          echo "Response:"
+          head -c 1000 /tmp/tsetmc_search.json || true
+
+      - name: Test TSETMC History API
+        run: |
+          echo "=== TSETMC History API ==="
+          curl -L \
+            --max-time 30 \
+            -A "Mozilla/5.0" \
+            "https://cdn.tsetmc.com/api/ClosingPrice/GetClosingPriceDailyList/46348559193224090/10" \
+            -o /tmp/tsetmc_history.json \
+            -w "\nHTTP_STATUS=%{http_code}\nTIME=%{time_total}\n" \
+            || true
+
+          echo "Response:"
+          head -c 1000 /tmp/tsetmc_history.json || true
