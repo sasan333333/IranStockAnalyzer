@@ -1,9 +1,16 @@
 package com.iranstockanalyzer.data.api
 
-import retrofit2.http.GET
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
-interface ApiService {
+object RetrofitClient {
 
-    @GET("health")
-    suspend fun healthCheck(): Map<String, String>
+    private const val BASE_URL = "http://10.0.2.2:8000/"
+
+    val apiService: ApiService =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
 }
