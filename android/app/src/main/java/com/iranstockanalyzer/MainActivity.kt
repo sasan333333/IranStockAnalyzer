@@ -46,7 +46,19 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val data = RetrofitClient.apiService.marketData(symbol)
-                    result.text = data.toString()
+
+                    val symbolValue = data["symbol"] ?: "-"
+                    val lastPrice = data["last_price"] ?: "-"
+                    val closePrice = data["close_price"] ?: "-"
+                    val volume = data["volume"] ?: "-"
+
+                    result.text = """
+                        Symbol: $symbolValue
+                        Last Price: $lastPrice
+                        Close Price: $closePrice
+                        Volume: $volume
+                    """.trimIndent()
+
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
                 }
