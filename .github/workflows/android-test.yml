@@ -10,6 +10,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Android structure
+      - name: Check Android project
         run: |
-          find android -maxdepth 4 -type f | sort
+          find android -maxdepth 6 -type f | sort
+
+      - name: Check backend
+        run: |
+          python -m py_compile backend/app/api/routes.py
+          python -m py_compile backend/app/services/market_data_service.py
