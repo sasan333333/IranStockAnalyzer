@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         symbolInput.hint = "Symbol"
 
         val button = Button(this)
-        button.text = "Get Market Data"
+        button.text = "Analyze"
 
         val result = TextView(this)
 
@@ -47,16 +47,11 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val data = RetrofitClient.apiService.marketData(symbol)
 
-                    val symbolValue = data["symbol"] ?: "-"
-                    val lastPrice = data["last_price"] ?: "-"
-                    val closePrice = data["close_price"] ?: "-"
-                    val volume = data["volume"] ?: "-"
-
                     result.text = """
-                        Symbol: $symbolValue
-                        Last Price: $lastPrice
-                        Close Price: $closePrice
-                        Volume: $volume
+                        Symbol: ${data["symbol"] ?: "-"}
+                        Last Price: ${data["last_price"] ?: "-"}
+                        Close Price: ${data["close_price"] ?: "-"}
+                        Volume: ${data["volume"] ?: "-"}
                     """.trimIndent()
 
                 } catch (e: Exception) {
