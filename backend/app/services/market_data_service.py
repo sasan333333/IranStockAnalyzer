@@ -1,4 +1,4 @@
-from app.providers.tsetmc import TSETMCProvider
+from app.providers.tsetmc_provider import TSETMCProvider
 from app.providers.normalizer import normalize_market_data
 
 
