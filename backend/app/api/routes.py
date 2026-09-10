@@ -13,4 +13,11 @@ def health_check():
 
 @router.get("/market-data")
 def market_data():
-    return market_data_service.get_market_data()
+    data = market_data_service.get_market_data()
+
+    return {
+        "symbol": data.symbol,
+        "last_price": data.last_price,
+        "close_price": data.close_price,
+        "volume": data.volume,
+    }
