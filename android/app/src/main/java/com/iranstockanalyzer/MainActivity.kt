@@ -1,6 +1,9 @@
 package com.iranstockanalyzer
 
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.iranstockanalyzer.data.api.RetrofitClient
@@ -13,16 +16,33 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val textView = TextView(this)
-        textView.text = "Loading Market Data..."
-        setContentView(textView)
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
 
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val data = RetrofitClient.apiService.marketData()
-                textView.text = data.toString()
-            } catch (e: Exception) {
-                textView.text = "Error: ${e.message}"
+        val symbolInput = EditText(this)
+        symbolInput.hint = "Symbol"
+
+        val button = Button(this)
+        button.text = "Get Market Data"
+
+        val result = TextView(this)
+
+        layout.addView(symbolInput)
+        layout.addView(button)
+        layout.addView(result)
+
+        setContentView(layout)
+
+        button.setOnClickListener {
+            val symbol = symbolInput.text.toString()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val data = RetrofitClient.apiService.marketData(symbol)
+                    result.text = data.toString()
+                } catch (e: Exception) {
+                    result.text = "Error: ${e.message}"
+                }
             }
         }
     }
