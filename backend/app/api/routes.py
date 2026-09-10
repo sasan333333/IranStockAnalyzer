@@ -11,9 +11,9 @@ def health_check():
     return {"status": "ok"}
 
 
-@router.get("/market-data")
-def market_data():
-    data = market_data_service.get_market_data()
+@router.get("/market-data/{symbol}")
+def market_data(symbol: str):
+    data = market_data_service.get_market_data(symbol)
 
     return {
         "symbol": data.symbol,
