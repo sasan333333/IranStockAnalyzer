@@ -19,12 +19,12 @@ jobs:
         run: |
           pip install fastapi uvicorn requests
 
-      - name: Test Stock Analysis
+      - name: Test Market History
         env:
           PYTHONPATH: backend
         run: |
           python -c "from app.main import app"
-          python -c "from app.models.market_data import MarketData"
+          python -c "from app.models.market_history import MarketHistory"
           python -c "from app.providers.tsetmc_provider import TSETMCProvider"
-          python -c "from app.services.market_data_service import MarketDataService"
-          echo "Stock Analysis chain OK"
+          python -c "from app.api.routes import market_history; print(market_history('فولاد'))"
+          echo "Market History API OK"
