@@ -19,12 +19,10 @@ jobs:
         run: |
           pip install fastapi uvicorn requests
 
-      - name: Test MarketData imports
+      - name: Test Symbol API
         env:
           PYTHONPATH: backend
         run: |
-          python -c "from app.models.market_data import MarketData"
-          python -c "from app.providers.normalizer import normalize_market_data"
-          python -c "from app.services.market_data_service import MarketDataService"
           python -c "from app.main import app"
-          echo "MarketData chain OK"
+          python -c "from app.api.routes import market_data; print(market_data('فولاد'))"
+          echo "Symbol API OK"
