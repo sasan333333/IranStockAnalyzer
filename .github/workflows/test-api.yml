@@ -20,6 +20,8 @@ jobs:
           pip install fastapi uvicorn
 
       - name: Test MarketData imports
+        env:
+          PYTHONPATH: backend
         run: |
           python -c "from app.models.market_data import MarketData"
           python -c "from app.providers.normalizer import normalize_market_data"
