@@ -21,3 +21,8 @@ def market_data(symbol: str):
         "close_price": data.close_price,
         "volume": data.volume,
     }
+
+
+@router.get("/market-history/{symbol}")
+def market_history(symbol: str):
+    return market_data_service.provider.get_history(symbol)
