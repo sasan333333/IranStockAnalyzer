@@ -7,6 +7,6 @@ class MarketDataService:
     def __init__(self):
         self.provider = TSETMCProvider()
 
-    def get_market_data(self):
-        raw_data = self.provider.get_market_data()
+    def get_market_data(self, symbol: str):
+        raw_data = self.provider.get_market_data(symbol)
         return normalize_market_data(raw_data)
