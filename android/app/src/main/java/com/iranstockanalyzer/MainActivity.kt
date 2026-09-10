@@ -34,7 +34,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(layout)
 
         button.setOnClickListener {
-            val symbol = symbolInput.text.toString()
+            val symbol = symbolInput.text.toString().trim()
+
+            if (symbol.isEmpty()) {
+                result.text = "Enter symbol"
+                return@setOnClickListener
+            }
+
+            result.text = "Loading..."
 
             CoroutineScope(Dispatchers.Main).launch {
                 try {
