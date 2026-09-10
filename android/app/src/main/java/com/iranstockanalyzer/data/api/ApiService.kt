@@ -12,4 +12,9 @@ interface ApiService {
     suspend fun marketData(
         @Path("symbol") symbol: String
     ): Map<String, Any>
+
+    @GET("market-history/{symbol}")
+    suspend fun marketHistory(
+        @Path("symbol") symbol: String
+    ): List<Map<String, Any>>
 }
