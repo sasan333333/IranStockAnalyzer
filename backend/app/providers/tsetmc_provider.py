@@ -20,3 +20,6 @@ class TSETMCProvider:
             "close_price": data.get("pClosing"),
             "volume": data.get("qTotTran5J"),
         }
+
+    def get_history(self, symbol: str):
+        return []
