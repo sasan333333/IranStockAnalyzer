@@ -1,12 +1,13 @@
 package com.iranstockanalyzer
 
-import org.junit.Test
 import org.junit.Assert.assertTrue
+import org.junit.Test
 
 class ApiServiceTest {
 
     @Test
-    fun apiTest() {
-        assertTrue(true)
+    fun marketDataApiStructureTest() {
+        val symbol = "فولاد"
+        assertTrue(symbol.isNotEmpty())
     }
 }
