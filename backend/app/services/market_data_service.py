@@ -1,5 +1,8 @@
 from app.providers.tsetmc_provider import TSETMCProvider
-from app.providers.normalizer import normalize_market_data
+from app.providers.normalizer import (
+    normalize_market_data,
+    normalize_market_history,
+)
 
 
 class MarketDataService:
@@ -12,4 +15,5 @@ class MarketDataService:
         return normalize_market_data(raw_data)
 
     def get_history(self, symbol: str):
-        return self.provider.get_history(symbol)
+        raw_history = self.provider.get_history(symbol)
+        return normalize_market_history(raw_history)
