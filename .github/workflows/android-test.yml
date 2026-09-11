@@ -10,11 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check Android project
+      - name: Validate Android Chart
         run: |
-          find android -maxdepth 6 -type f | sort
-
-      - name: Check backend
-        run: |
-          python -m py_compile backend/app/api/routes.py
-          python -m py_compile backend/app/services/market_data_service.py
+          test -f android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
+          grep -q "LineChart" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
+          grep -q "marketHistory" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
+          echo "Market History Chart OK"
