@@ -21,9 +21,9 @@ def normalize_market_history(raw_history):
         result.append(
             MarketHistory(
                 date=str(item.get("dEven") or item.get("date")),
-                open_price=item.get("pOpening"),
-                high_price=item.get("pHigh"),
-                low_price=item.get("pLow"),
+                open_price=item.get("priceFirst"),
+                high_price=item.get("priceMax"),
+                low_price=item.get("priceMin"),
                 close_price=item.get("pClosing"),
                 volume=item.get("qTotTran5J"),
             )
