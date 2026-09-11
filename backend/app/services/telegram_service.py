@@ -24,7 +24,12 @@ class TelegramService:
 
         return response.json()
 
-    def send_chart(self, chat_id: str, chart_path: str, caption: str = ""):
+    def send_chart(
+        self,
+        chat_id: str,
+        chart_path: str,
+        caption: str = "",
+    ):
         url = f"{self.BASE_URL}/bot{self.bot_token}/sendPhoto"
 
         with open(chart_path, "rb") as chart:
