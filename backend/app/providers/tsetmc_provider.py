@@ -9,15 +9,20 @@ class TSETMCProvider:
         "User-Agent": "Mozilla/5.0"
     }
 
-    def get_instrument_code(self, symbol: str):
+    def _get(self, endpoint: str):
         response = requests.get(
-            f"{self.BASE_URL}/Instrument/GetInstrumentSearch/{symbol}",
+            f"{self.BASE_URL}/{endpoint}",
             headers=self.HEADERS,
-            timeout=20
+            timeout=30,
         )
         response.raise_for_status()
+        return response.json()
 
-        data = response.json()
+    def get_instrument_code(self, symbol: str):
+        data = self._get(
+            f"Instrument/GetInstrumentSearch/{symbol}"
+        )
+
         results = data.get("instrumentSearch", [])
 
         if not results:
@@ -31,20 +36,17 @@ class TSETMCProvider:
         if not ins_code:
             raise ValueError("Symbol not found")
 
-        response = requests.get(
-            f"{self.BASE_URL}/ClosingPrice/GetClosingPriceInfo/{ins_code}",
-            headers=self.HEADERS,
-            timeout=20
+        data = self._get(
+            f"ClosingPrice/GetClosingPriceInfo/{ins_code}"
         )
-        response.raise_for_status()
 
-        data = response.json().get("closingPriceInfo", {})
+        info = data.get("closingPriceInfo", {})
 
         return {
             "symbol": symbol,
-            "last_price": data.get("pDrCotVal"),
-            "close_price": data.get("pClosing"),
-            "volume": data.get("qTotTran5J"),
+            "last_price": info.get("pDrCotVal"),
+            "close_price": info.get("pClosing"),
+            "volume": info.get("qTotTran5J"),
         }
 
     def get_history(self, symbol: str):
@@ -53,13 +55,8 @@ class TSETMCProvider:
         if not ins_code:
             raise ValueError("Symbol not found")
 
-        response = requests.get(
-            f"{self.BASE_URL}/ClosingPrice/GetClosingPriceDailyList/{ins_code}/0",
-            headers=self.HEADERS,
-            timeout=30
+        data = self._get(
+            f"ClosingPrice/GetClosingPriceDailyList/{ins_code}/0"
         )
-        response.raise_for_status()
-
-        data = response.json()
 
         return data.get("closingPriceDaily", [])
