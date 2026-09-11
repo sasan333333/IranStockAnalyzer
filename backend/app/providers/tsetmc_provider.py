@@ -22,4 +22,12 @@ class TSETMCProvider:
         }
 
     def get_history(self, symbol: str):
-        return []
+        response = requests.get(
+            self.BASE_URL + symbol,
+            timeout=20
+        )
+        response.raise_for_status()
+
+        data = response.json()
+
+        return data.get("history", [])
