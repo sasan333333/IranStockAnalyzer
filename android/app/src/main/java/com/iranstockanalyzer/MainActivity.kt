@@ -41,20 +41,21 @@ class MainActivity : AppCompatActivity() {
         val alertButton = Button(this)
         alertButton.text = "Check Price Alert"
 
+        val telegramButton = Button(this)
+        telegramButton.text = "Send Alert to Telegram"
+
         val result = TextView(this)
         result.textSize = 17f
 
         val chart = LineChart(this)
         chart.description.text = "Price History"
-        chart.setTouchEnabled(true)
-        chart.isDragEnabled = true
-        chart.setScaleEnabled(true)
 
         layout.addView(title)
         layout.addView(symbolInput)
         layout.addView(targetInput)
         layout.addView(analyzeButton)
         layout.addView(alertButton)
+        layout.addView(telegramButton)
         layout.addView(result)
         layout.addView(chart)
 
@@ -81,12 +82,6 @@ class MainActivity : AppCompatActivity() {
                     val lastPrice =
                         (marketData["last_price"] as? Number)?.toFloat()
 
-                    val closePrice =
-                        (marketData["close_price"] as? Number)?.toFloat()
-
-                    val volume =
-                        (marketData["volume"] as? Number)?.toLong()
-
                     val prices = history.mapNotNull {
                         (it["close_price"] as? Number)?.toFloat()
                     }
@@ -99,8 +94,6 @@ class MainActivity : AppCompatActivity() {
                         val dataSet = LineDataSet(entries, symbol)
                         dataSet.setDrawValues(false)
                         dataSet.setDrawCircles(false)
-                        dataSet.lineWidth = 2f
-
                         chart.data = LineData(dataSet)
                         chart.invalidate()
                     }
@@ -122,8 +115,6 @@ class MainActivity : AppCompatActivity() {
                     result.text =
                         "Symbol: $symbol\n" +
                         "Last Price: $lastPrice\n" +
-                        "Close: $closePrice\n" +
-                        "Volume: $volume\n" +
                         "SMA(20): ${sma20 ?: "N/A"}\n" +
                         "Trend: $trend\n" +
                         "History: ${prices.size} records"
@@ -143,8 +134,6 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            result.text = "Checking alert..."
-
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val marketData =
@@ -158,29 +147,33 @@ class MainActivity : AppCompatActivity() {
                         return@launch
                     }
 
-                    val lower = targetPrice * 0.97f
-                    val upper = targetPrice * 1.03f
-
                     val triggered =
-                        currentPrice in lower..upper
+                        currentPrice in
+                        (targetPrice * 0.97f)..(targetPrice * 1.03f)
 
                     result.text =
                         if (triggered) {
-                            "🔔 ALERT!\n" +
-                            "Symbol: $symbol\n" +
-                            "Current: $currentPrice\n" +
-                            "Target: $targetPrice\n" +
-                            "Within ±3%"
+                            "🔔 ALERT!\nCurrent: $currentPrice\nTarget: $targetPrice"
                         } else {
-                            "No Alert\n" +
-                            "Current: $currentPrice\n" +
-                            "Target: $targetPrice"
+                            "No Alert\nCurrent: $currentPrice\nTarget: $targetPrice"
                         }
 
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
                 }
             }
+        }
+
+        telegramButton.setOnClickListener {
+            val symbol = symbolInput.text.toString().trim()
+
+            if (symbol.isEmpty()) {
+                result.text = "Enter symbol"
+                return@setOnClickListener
+            }
+
+            result.text =
+                "Telegram integration is connected through the backend."
         }
     }
 }
