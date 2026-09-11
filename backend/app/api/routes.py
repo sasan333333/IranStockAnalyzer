@@ -1,9 +1,11 @@
 from fastapi import APIRouter
 
 from app.services.market_data_service import MarketDataService
+from app.services.price_alert_service import PriceAlertService
 
 router = APIRouter()
 market_data_service = MarketDataService()
+price_alert_service = PriceAlertService()
 
 
 @router.get("/health")
@@ -38,3 +40,18 @@ def market_history(symbol: str):
         }
         for item in history
     ]
+
+
+@router.get("/price-alert/{symbol}")
+def price_alert(
+    symbol: str,
+    current_price: float,
+    target_price: float,
+    tolerance_percent: float = 3.0,
+):
+    return price_alert_service.check_alert(
+        symbol=symbol,
+        current_price=current_price,
+        target_price=target_price,
+        tolerance_percent=tolerance_percent,
+    )
