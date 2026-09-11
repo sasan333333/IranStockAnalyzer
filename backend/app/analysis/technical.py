@@ -91,3 +91,37 @@ def macd(values, fast_period=12, slow_period=26, signal_period=9):
         "signal": signal_line,
         "histogram": histogram
     }
+
+
+def trend_signal(
+    price,
+    sma_value=None,
+    ema_value=None,
+    rsi_value=None,
+    macd_value=None,
+    signal_value=None
+):
+    score = 0
+
+    if sma_value is not None:
+        score += 1 if price > sma_value else -1
+
+    if ema_value is not None:
+        score += 1 if price > ema_value else -1
+
+    if rsi_value is not None:
+        if rsi_value < 30:
+            score += 1
+        elif rsi_value > 70:
+            score -= 1
+
+    if macd_value is not None and signal_value is not None:
+        score += 1 if macd_value > signal_value else -1
+
+    if score >= 2:
+        return "BULLISH"
+
+    if score <= -2:
+        return "BEARISH"
+
+    return "NEUTRAL"
