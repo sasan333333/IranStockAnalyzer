@@ -6,6 +6,10 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.iranstockanalyzer.data.api.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -40,10 +44,36 @@ class MainActivity : AppCompatActivity() {
         analyzeButton.setOnClickListener {
             val symbol = symbolInput.text.toString().trim()
 
-            result.text = if (symbol.isEmpty()) {
-                "Enter symbol"
-            } else {
-                "Analyzing: $symbol"
+            if (symbol.isEmpty()) {
+                result.text = "Enter symbol"
+                return@setOnClickListener
+            }
+
+            result.text = "Loading $symbol..."
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val marketData =
+                        RetrofitClient.apiService.marketData(symbol)
+
+                    val lastPrice =
+                        (marketData["last_price"] as? Number)?.toFloat()
+
+                    val closePrice =
+                        (marketData["close_price"] as? Number)?.toFloat()
+
+                    val volume =
+                        (marketData["volume"] as? Number)?.toLong()
+
+                    result.text =
+                        "Symbol: $symbol\n\n" +
+                        "Last Price: ${lastPrice ?: "N/A"}\n" +
+                        "Close Price: ${closePrice ?: "N/A"}\n" +
+                        "Volume: ${volume ?: "N/A"}"
+
+                } catch (e: Exception) {
+                    result.text = "Error: ${e.message}"
+                }
             }
         }
     }
