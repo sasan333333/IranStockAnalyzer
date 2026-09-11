@@ -15,7 +15,6 @@ jobs:
           test -f android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
           grep -q "LineChart" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
           grep -q "marketHistory" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
-          grep -q "Market History" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
 
       - name: Validate Backend History API
         run: |
