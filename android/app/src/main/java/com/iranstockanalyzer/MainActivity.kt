@@ -7,10 +7,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import com.iranstockanalyzer.data.api.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,9 +36,13 @@ class MainActivity : AppCompatActivity() {
         analyzeButton.text = "Analyze Stock"
 
         val result = TextView(this)
-        result.textSize = 18f
+        result.textSize = 17f
 
         val chart = LineChart(this)
+        chart.description.text = "Price History"
+        chart.setTouchEnabled(true)
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(true)
 
         layout.addView(title)
         layout.addView(symbolInput)
@@ -71,12 +79,48 @@ class MainActivity : AppCompatActivity() {
                     val volume =
                         (marketData["volume"] as? Number)?.toLong()
 
+                    val prices = history.mapNotNull {
+                        (it["close_price"] as? Number)?.toFloat()
+                    }
+
+                    val entries = prices.mapIndexed { index, price ->
+                        Entry(index.toFloat(), price)
+                    }
+
+                    if (entries.isNotEmpty()) {
+                        val dataSet = LineDataSet(entries, symbol)
+                        dataSet.setDrawValues(false)
+                        dataSet.setDrawCircles(false)
+                        dataSet.lineWidth = 2f
+
+                        chart.data = LineData(dataSet)
+                        chart.invalidate()
+                    } else {
+                        chart.clear()
+                    }
+
+                    val sma20 =
+                        if (prices.size >= 20) {
+                            prices.takeLast(20).average().toFloat()
+                        } else {
+                            null
+                        }
+
+                    val trend = when {
+                        sma20 == null || lastPrice == null -> "N/A"
+                        lastPrice > sma20 -> "BULLISH"
+                        lastPrice < sma20 -> "BEARISH"
+                        else -> "NEUTRAL"
+                    }
+
                     result.text =
                         "Symbol: $symbol\n" +
                         "Last Price: $lastPrice\n" +
                         "Close: $closePrice\n" +
                         "Volume: $volume\n" +
-                        "History: ${history.size} records"
+                        "SMA(20): ${sma20 ?: "N/A"}\n" +
+                        "Trend: $trend\n" +
+                        "History: ${prices.size} records"
 
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
