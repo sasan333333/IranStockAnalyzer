@@ -10,9 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Validate Android Chart
+      - name: Validate Android Chart Integration
         run: |
           test -f android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
           grep -q "LineChart" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
           grep -q "marketHistory" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
-          echo "Market History Chart OK"
+          grep -q "Market History" android/app/src/main/java/com/iranstockanalyzer/MainActivity.kt
+
+      - name: Validate Backend History API
+        run: |
+          test -f backend/app/providers/tsetmc_provider.py
+          grep -q "def get_history" backend/app/providers/tsetmc_provider.py
+          grep -q "market-history" backend/app/api/routes.py
+
+          echo "Android → API → History → Chart structure OK"
