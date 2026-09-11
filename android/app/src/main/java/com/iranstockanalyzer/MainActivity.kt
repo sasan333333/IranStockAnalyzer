@@ -57,9 +57,7 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val data = RetrofitClient.apiService.marketHistory(symbol)
-
                     result.text = "History: ${data.size} records"
-
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
                 }
