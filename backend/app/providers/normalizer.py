@@ -1,4 +1,5 @@
 from app.models.market_data import MarketData
+from app.models.market_history import MarketHistory
 
 
 def normalize_market_data(raw_data):
@@ -11,3 +12,21 @@ def normalize_market_data(raw_data):
         volume=int(raw_data["volume"])
         if raw_data.get("volume") is not None else None,
     )
+
+
+def normalize_market_history(raw_history):
+    result = []
+
+    for item in raw_history:
+        result.append(
+            MarketHistory(
+                date=str(item.get("dEven") or item.get("date")),
+                open_price=item.get("pOpening"),
+                high_price=item.get("pHigh"),
+                low_price=item.get("pLow"),
+                close_price=item.get("pClosing"),
+                volume=item.get("qTotTran5J"),
+            )
+        )
+
+    return result
