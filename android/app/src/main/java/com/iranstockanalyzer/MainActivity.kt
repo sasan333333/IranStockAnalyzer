@@ -7,9 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.iranstockanalyzer.data.api.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,25 +19,32 @@ class MainActivity : AppCompatActivity() {
 
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
+        layout.setPadding(32, 32, 32, 32)
+
+        val title = TextView(this)
+        title.text = "Iran Stock Analyzer"
+        title.textSize = 24f
 
         val symbolInput = EditText(this)
-        symbolInput.hint = "Symbol"
+        symbolInput.hint = "Enter Symbol"
 
-        val button = Button(this)
-        button.text = "Analyze"
+        val analyzeButton = Button(this)
+        analyzeButton.text = "Analyze"
 
         val result = TextView(this)
+        result.textSize = 18f
 
         val chart = LineChart(this)
 
+        layout.addView(title)
         layout.addView(symbolInput)
-        layout.addView(button)
+        layout.addView(analyzeButton)
         layout.addView(result)
         layout.addView(chart)
 
         setContentView(layout)
 
-        button.setOnClickListener {
+        analyzeButton.setOnClickListener {
             val symbol = symbolInput.text.toString().trim()
 
             if (symbol.isEmpty()) {
@@ -53,18 +57,6 @@ class MainActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     val data = RetrofitClient.apiService.marketHistory(symbol)
-
-                    val entries = data.mapIndexed { index, item ->
-                        Entry(
-                            index.toFloat(),
-                            (item["close_price"] as? Number)?.toFloat() ?: 0f
-                        )
-                    }
-
-                    val dataSet = LineDataSet(entries, symbol)
-
-                    chart.data = LineData(dataSet)
-                    chart.invalidate()
 
                     result.text = "History: ${data.size} records"
 
