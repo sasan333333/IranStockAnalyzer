@@ -26,10 +26,10 @@ class MainActivity : AppCompatActivity() {
         title.textSize = 24f
 
         val symbolInput = EditText(this)
-        symbolInput.hint = "Enter Symbol"
+        symbolInput.hint = "Symbol"
 
         val analyzeButton = Button(this)
-        analyzeButton.text = "Analyze"
+        analyzeButton.text = "Analyze Stock"
 
         val result = TextView(this)
         result.textSize = 18f
@@ -52,12 +52,32 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            result.text = "Loading..."
+            result.text = "Analyzing $symbol..."
 
             CoroutineScope(Dispatchers.Main).launch {
                 try {
-                    val data = RetrofitClient.apiService.marketHistory(symbol)
-                    result.text = "History: ${data.size} records"
+                    val marketData =
+                        RetrofitClient.apiService.marketData(symbol)
+
+                    val history =
+                        RetrofitClient.apiService.marketHistory(symbol)
+
+                    val lastPrice =
+                        (marketData["last_price"] as? Number)?.toFloat()
+
+                    val closePrice =
+                        (marketData["close_price"] as? Number)?.toFloat()
+
+                    val volume =
+                        (marketData["volume"] as? Number)?.toLong()
+
+                    result.text =
+                        "Symbol: $symbol\n" +
+                        "Last Price: $lastPrice\n" +
+                        "Close: $closePrice\n" +
+                        "Volume: $volume\n" +
+                        "History: ${history.size} records"
+
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
                 }
