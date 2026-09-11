@@ -31,8 +31,18 @@ class MainActivity : AppCompatActivity() {
         val symbolInput = EditText(this)
         symbolInput.hint = "Enter Symbol"
 
+        val targetInput = EditText(this)
+        targetInput.hint = "Target Price"
+        targetInput.inputType = 2
+
         val analyzeButton = Button(this)
         analyzeButton.text = "Analyze Stock"
+
+        val alertButton = Button(this)
+        alertButton.text = "Check Price Alert"
+
+        val telegramButton = Button(this)
+        telegramButton.text = "Send Alert to Telegram"
 
         val result = TextView(this)
         result.textSize = 18f
@@ -47,8 +57,12 @@ class MainActivity : AppCompatActivity() {
 
         layout.addView(title)
         layout.addView(symbolInput)
+        layout.addView(targetInput)
         layout.addView(analyzeButton)
+        layout.addView(alertButton)
+        layout.addView(telegramButton)
         layout.addView(result)
+
         layout.addView(
             chart,
             LinearLayout.LayoutParams(
@@ -80,12 +94,6 @@ class MainActivity : AppCompatActivity() {
                     val lastPrice =
                         (marketData["last_price"] as? Number)?.toFloat()
 
-                    val closePrice =
-                        (marketData["close_price"] as? Number)?.toFloat()
-
-                    val volume =
-                        (marketData["volume"] as? Number)?.toLong()
-
                     val prices = history.mapNotNull {
                         (it["close_price"] as? Number)?.toFloat()
                     }
@@ -107,16 +115,70 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     result.text =
-                        "Symbol: $symbol\n\n" +
+                        "Symbol: $symbol\n" +
                         "Last Price: ${lastPrice ?: "N/A"}\n" +
-                        "Close Price: ${closePrice ?: "N/A"}\n" +
-                        "Volume: ${volume ?: "N/A"}\n" +
                         "History: ${prices.size} records"
 
                 } catch (e: Exception) {
                     result.text = "Error: ${e.message}"
                 }
             }
+        }
+
+        alertButton.setOnClickListener {
+            val symbol = symbolInput.text.toString().trim()
+            val targetPrice = targetInput.text.toString().toFloatOrNull()
+
+            if (symbol.isEmpty() || targetPrice == null) {
+                result.text = "Enter symbol and target price"
+                return@setOnClickListener
+            }
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    val data =
+                        RetrofitClient.apiService.marketData(symbol)
+
+                    val currentPrice =
+                        (data["last_price"] as? Number)?.toFloat()
+
+                    if (currentPrice == null) {
+                        result.text = "Current price unavailable"
+                        return@launch
+                    }
+
+                    val lower = targetPrice * 0.97f
+                    val upper = targetPrice * 1.03f
+                    val triggered =
+                        currentPrice in lower..upper
+
+                    result.text =
+                        if (triggered) {
+                            "🔔 ALERT!\n" +
+                            "Current: $currentPrice\n" +
+                            "Target: $targetPrice"
+                        } else {
+                            "No Alert\n" +
+                            "Current: $currentPrice\n" +
+                            "Target: $targetPrice"
+                        }
+
+                } catch (e: Exception) {
+                    result.text = "Error: ${e.message}"
+                }
+            }
+        }
+
+        telegramButton.setOnClickListener {
+            val symbol = symbolInput.text.toString().trim()
+
+            if (symbol.isEmpty()) {
+                result.text = "Enter symbol"
+                return@setOnClickListener
+            }
+
+            result.text =
+                "Telegram alert is handled by the backend."
         }
     }
 }
