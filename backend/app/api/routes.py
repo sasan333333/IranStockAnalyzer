@@ -82,8 +82,16 @@ def technical_analysis(symbol: str):
     latest_sma = sma_values[-1] if sma_values else None
     latest_ema = ema_values[-1] if ema_values else None
     latest_rsi = rsi_values[-1] if rsi_values else None
-    latest_macd = macd_values["macd"][-1] if macd_values["macd"] else None
-    latest_signal = macd_values["signal"][-1] if macd_values["signal"] else None
+    latest_macd = (
+        macd_values["macd"][-1]
+        if macd_values["macd"]
+        else None
+    )
+    latest_signal = (
+        macd_values["signal"][-1]
+        if macd_values["signal"]
+        else None
+    )
 
     trend = trend_signal(
         price=prices[-1],
