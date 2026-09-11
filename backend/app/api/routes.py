@@ -82,16 +82,8 @@ def technical_analysis(symbol: str):
     latest_sma = sma_values[-1] if sma_values else None
     latest_ema = ema_values[-1] if ema_values else None
     latest_rsi = rsi_values[-1] if rsi_values else None
-    latest_macd = (
-        macd_values["macd"][-1]
-        if macd_values["macd"]
-        else None
-    )
-    latest_signal = (
-        macd_values["signal"][-1]
-        if macd_values["signal"]
-        else None
-    )
+    latest_macd = macd_values["macd"][-1] if macd_values["macd"] else None
+    latest_signal = macd_values["signal"][-1] if macd_values["signal"] else None
 
     trend = trend_signal(
         price=prices[-1],
@@ -115,13 +107,21 @@ def technical_analysis(symbol: str):
 @router.get("/price-alert/{symbol}")
 def price_alert(
     symbol: str,
-    current_price: float,
     target_price: float,
     tolerance_percent: float = 3.0,
 ):
+    market_data = market_data_service.get_market_data(symbol)
+
+    if market_data.last_price is None:
+        return {
+            "symbol": symbol,
+            "triggered": False,
+            "message": "Current price unavailable",
+        }
+
     return price_alert_service.check_alert(
         symbol=symbol,
-        current_price=current_price,
+        current_price=market_data.last_price,
         target_price=target_price,
         tolerance_percent=tolerance_percent,
     )
