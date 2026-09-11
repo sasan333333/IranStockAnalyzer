@@ -19,14 +19,12 @@ jobs:
         run: |
           pip install fastapi uvicorn requests
 
-      - name: Test History Chain
+      - name: Test Price Alert
         env:
           PYTHONPATH: backend
         run: |
           python -c "from app.main import app"
-          python -c "from app.models.market_history import MarketHistory"
-          python -c "from app.providers.tsetmc_provider import TSETMCProvider"
-          python -c "from app.providers.normalizer import normalize_market_history"
-          python -c "from app.services.market_data_service import MarketDataService"
-          python -c "from app.api.routes import market_history"
-          echo "Backend History Chain OK"
+          python -c "from app.models.price_alert import PriceAlert"
+          python -c "from app.services.price_alert_service import PriceAlertService"
+          python -c "from app.api.routes import price_alert; print(price_alert('فولاد', 9700, 10000))"
+          echo "Price Alert API OK"
