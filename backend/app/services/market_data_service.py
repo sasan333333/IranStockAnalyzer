@@ -12,8 +12,10 @@ class MarketDataService:
 
     def get_market_data(self, symbol: str):
         raw_data = self.provider.get_market_data(symbol)
+
         return normalize_market_data(raw_data)
 
     def get_history(self, symbol: str):
         raw_history = self.provider.get_history(symbol)
+
         return normalize_market_history(raw_history)
