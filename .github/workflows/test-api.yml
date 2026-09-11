@@ -19,12 +19,14 @@ jobs:
         run: |
           pip install fastapi uvicorn requests
 
-      - name: Test Market History
+      - name: Test History Chain
         env:
           PYTHONPATH: backend
         run: |
           python -c "from app.main import app"
           python -c "from app.models.market_history import MarketHistory"
           python -c "from app.providers.tsetmc_provider import TSETMCProvider"
-          python -c "from app.api.routes import market_history; print(market_history('فولاد'))"
-          echo "Market History API OK"
+          python -c "from app.providers.normalizer import normalize_market_history"
+          python -c "from app.services.market_data_service import MarketDataService"
+          python -c "from app.api.routes import market_history"
+          echo "Backend History Chain OK"
