@@ -25,4 +25,16 @@ def market_data(symbol: str):
 
 @router.get("/market-history/{symbol}")
 def market_history(symbol: str):
-    return market_data_service.provider.get_history(symbol)
+    history = market_data_service.get_history(symbol)
+
+    return [
+        {
+            "date": item.date,
+            "open_price": item.open_price,
+            "high_price": item.high_price,
+            "low_price": item.low_price,
+            "close_price": item.close_price,
+            "volume": item.volume,
+        }
+        for item in history
+    ]
