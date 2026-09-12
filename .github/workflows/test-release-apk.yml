@@ -1,0 +1,30 @@
+name: Test Release APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x android/gradlew
+
+      - name: Build Release APK
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Verify APK
+        run: |
+          test -f android/app/build/outputs/apk/release/app-release.apk
+          test -s android/app/build/outputs/apk/release/app-release.apk
+          echo "RELEASE APK TEST OK"
