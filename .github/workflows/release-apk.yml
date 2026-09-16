@@ -29,13 +29,14 @@ jobs:
         run: gradle wrapper --gradle-version 8.9
 
       - name: Make Gradle Wrapper Executable
-        run: chmod +x android/gradlew
+        working-directory: android
+        run: chmod +x gradlew
 
       - name: Build Release APK
         working-directory: android
         run: ./gradlew assembleRelease --stacktrace --info
 
       - name: Verify APK
-  run: |
-    echo "Searching for APK..."
-    find android/app/build -type f -name "*.apk" -print
+        run: |
+          echo "Searching for APK..."
+          find android/app/build -type f -name "*.apk" -print
