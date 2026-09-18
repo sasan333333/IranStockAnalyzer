@@ -6,7 +6,7 @@ class TelegramChartService:
         self.market_data_service = MarketDataService()
 
     def build_chart_request(self, symbol: str) -> dict:
-        history = self.market_data_service.get_market_history(symbol)
+        history = self.market_data_service.get_history(symbol)
 
         return {
             "symbol": symbol,
