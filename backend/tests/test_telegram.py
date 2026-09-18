@@ -77,3 +77,37 @@ def test_telegram_delivery_service():
     assert result["status"] == "ready"
     assert result["type"] == "telegram_chart"
     assert result["data"] == chart_data
+
+
+def test_telegram_webhook():
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {
+                "text": "/start"
+            }
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "processed"
+    assert data["response"] == "IranStockAnalyzer Bot"
+
+
+def test_telegram_webhook_empty_message():
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {}
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "ignored"
+    assert data["response"] is None
