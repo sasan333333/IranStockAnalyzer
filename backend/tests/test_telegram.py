@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.telegram_delivery_service import TelegramDeliveryService
 
 
 client = TestClient(app)
@@ -53,6 +54,24 @@ def test_telegram_chart_command(monkeypatch):
     data = response.json()["response"]
 
     assert data["symbol"] == "NOURI"
-    assert data["type"] == "market_history_chart"
-    assert data["status"] == "requested"
-    assert data["data"] == fake_history
+    assert data["type"] == "telegram_chart"
+    assert data["status"] == "ready"
+    assert data["data"]["type"] == "market_history_chart"
+    assert data["data"]["data"] == fake_history
+
+
+def test_telegram_delivery_service():
+    service = TelegramDeliveryService()
+
+    chart_data = {
+        "symbol": "NOURI",
+        "type": "market_history_chart",
+        "status": "requested",
+        "data": [],
+    }
+
+    result = service.send_chart(chart_data)
+
+    assert result["status"] == "ready"
+    assert result["type"] == "telegram_chart"
+    assert result["data"] == chart_data
