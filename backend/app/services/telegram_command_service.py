@@ -10,7 +10,7 @@ class TelegramCommandService:
             return "IranStockAnalyzer Bot"
 
         if command == "/help":
-            return "Commands: /start, /help, /market"
+            return "Commands: /start, /help, /market, /chart"
 
         if command.startswith("/market "):
             symbol = command.split(" ", 1)[1].strip()
@@ -26,5 +26,13 @@ class TelegramCommandService:
                 f"Close Price: {data.close_price}\n"
                 f"Volume: {data.volume}"
             )
+
+        if command.startswith("/chart "):
+            symbol = command.split(" ", 1)[1].strip()
+
+            if not symbol:
+                return "Symbol is required"
+
+            return f"Chart requested for {symbol}"
 
         return "Unknown command"
