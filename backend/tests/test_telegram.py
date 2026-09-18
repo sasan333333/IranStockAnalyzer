@@ -83,11 +83,7 @@ def test_telegram_delivery_service():
 def test_telegram_webhook():
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {
-                "text": "/start"
-            }
-        },
+        json={"message": {"text": "/start"}},
     )
 
     assert response.status_code == 200
@@ -101,9 +97,7 @@ def test_telegram_webhook():
 def test_telegram_webhook_empty_message():
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {}
-        },
+        json={"message": {}},
     )
 
     assert response.status_code == 200
@@ -117,11 +111,7 @@ def test_telegram_webhook_empty_message():
 def test_telegram_webhook_blank_message():
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {
-                "text": "   "
-            }
-        },
+        json={"message": {"text": "   "}},
     )
 
     assert response.status_code == 200
@@ -135,11 +125,7 @@ def test_telegram_webhook_blank_message():
 def test_telegram_webhook_unknown_command():
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {
-                "text": "   /unknown   "
-            }
-        },
+        json={"message": {"text": "   /unknown   "}},
     )
 
     assert response.status_code == 200
@@ -167,11 +153,7 @@ def test_telegram_webhook_market_command(monkeypatch):
 
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {
-                "text": "/market NOURI"
-            }
-        },
+        json={"message": {"text": "/market NOURI"}},
     )
 
     assert response.status_code == 200
@@ -203,11 +185,7 @@ def test_telegram_webhook_chart_command(monkeypatch):
 
     response = client.post(
         "/telegram/webhook",
-        json={
-            "message": {
-                "text": "/chart NOURI"
-            }
-        },
+        json={"message": {"text": "/chart NOURI"}},
     )
 
     assert response.status_code == 200
@@ -219,3 +197,17 @@ def test_telegram_webhook_chart_command(monkeypatch):
     assert data["response"]["type"] == "telegram_chart"
     assert data["response"]["status"] == "ready"
     assert data["response"]["data"]["data"] == fake_history
+
+
+def test_telegram_market_without_symbol():
+    response = client.get("/telegram/command/%2Fmarket%20")
+
+    assert response.status_code == 200
+    assert response.json()["response"] == "Symbol is required"
+
+
+def test_telegram_chart_without_symbol():
+    response = client.get("/telegram/command/%2Fchart%20")
+
+    assert response.status_code == 200
+    assert response.json()["response"] == "Symbol is required"
