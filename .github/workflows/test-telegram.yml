@@ -24,5 +24,7 @@ jobs:
 
       - name: Run Telegram tests
         working-directory: backend
+        env:
+          PYTHONPATH: .
         run: |
           pytest tests/test_telegram.py -v
