@@ -76,6 +76,7 @@ def test_telegram_delivery_service():
 
     assert result["status"] == "ready"
     assert result["type"] == "telegram_chart"
+    assert result["symbol"] == "NOURI"
     assert result["data"] == chart_data
 
 
@@ -147,3 +148,74 @@ def test_telegram_webhook_unknown_command():
 
     assert data["status"] == "processed"
     assert data["response"] == "Unknown command"
+
+
+def test_telegram_webhook_market_command(monkeypatch):
+    class FakeMarketData:
+        symbol = "NOURI"
+        last_price = 1000
+        close_price = 990
+        volume = 50000
+
+    def fake_get_market_data(self, symbol):
+        return FakeMarketData()
+
+    monkeypatch.setattr(
+        "app.services.market_data_service.MarketDataService.get_market_data",
+        fake_get_market_data,
+    )
+
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {
+                "text": "/market NOURI"
+            }
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "processed"
+    assert "Symbol: NOURI" in data["response"]
+
+
+def test_telegram_webhook_chart_command(monkeypatch):
+    fake_history = [
+        {
+            "date": "2026-09-18",
+            "open": 1000,
+            "high": 1100,
+            "low": 900,
+            "close": 1050,
+        }
+    ]
+
+    def fake_get_history(self, symbol):
+        return fake_history
+
+    monkeypatch.setattr(
+        "app.services.market_data_service.MarketDataService.get_history",
+        fake_get_history,
+    )
+
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {
+                "text": "/chart NOURI"
+            }
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "processed"
+    assert data["response"]["symbol"] == "NOURI"
+    assert data["response"]["type"] == "telegram_chart"
+    assert data["response"]["status"] == "ready"
+    assert data["response"]["data"]["data"] == fake_history
