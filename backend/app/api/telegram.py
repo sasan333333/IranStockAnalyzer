@@ -19,7 +19,7 @@ def telegram_market_data(symbol: str):
     return service.get_market_data(symbol)
 
 
-@router.get("/telegram/command/{command}")
+@router.get("/telegram/command/{command:path}")
 def telegram_command(command: str):
     return {
         "response": command_service.handle(command)
