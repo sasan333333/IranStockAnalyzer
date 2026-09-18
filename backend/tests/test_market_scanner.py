@@ -1,60 +1,64 @@
-from app.services.market_data_service import MarketDataService
+from app.services.market_scanner_service import MarketScannerService
 
 
-class MarketScannerService:
+def test_market_scanner():
+    service = MarketScannerService()
 
-    def __init__(self):
-        self.market_data_service = MarketDataService()
+    class FakeData:
+        symbol = "NOURI"
+        last_price = 1000
+        close_price = 990
+        volume = 50000
 
-    def scan(self, symbols: list[str]) -> list[dict]:
-        results = []
+    service.market_data_service.get_market_data = lambda symbol: FakeData()
 
-        for symbol in symbols:
-            data = self.market_data_service.get_market_data(symbol)
+    result = service.scan(["NOURI"])
 
-            results.append(
-                {
-                    "symbol": data.symbol,
-                    "last_price": data.last_price,
-                    "close_price": data.close_price,
-                    "volume": data.volume,
-                }
-            )
+    assert result == [
+        {
+            "symbol": "NOURI",
+            "last_price": 1000,
+            "close_price": 990,
+            "volume": 50000,
+        }
+    ]
 
-        return results
 
-    def filter_volume(
-        self,
-        results: list[dict],
-        minimum_volume: int,
-    ) -> list[dict]:
-        return [
-            result
-            for result in results
-            if result["volume"] >= minimum_volume
-        ]
+def test_filter_volume():
+    service = MarketScannerService()
 
-    def filter_price_change(
-        self,
-        results: list[dict],
-        minimum_change_percent: float,
-    ) -> list[dict]:
-        filtered = []
+    results = [
+        {"symbol": "NOURI", "volume": 50000},
+        {"symbol": "FOLD", "volume": 10000},
+    ]
 
-        for result in results:
-            close_price = result["close_price"]
-            last_price = result["last_price"]
+    result = service.filter_volume(results, 20000)
 
-            if close_price == 0:
-                continue
+    assert result == [
+        {"symbol": "NOURI", "volume": 50000},
+    ]
 
-            change_percent = (
-                (last_price - close_price) / close_price
-            ) * 100
 
-            if change_percent >= minimum_change_percent:
-                result = result.copy()
-                result["price_change_percent"] = change_percent
-                filtered.append(result)
+def test_filter_price_change():
+    service = MarketScannerService()
 
-        return filtered
+    results = [
+        {
+            "symbol": "NOURI",
+            "last_price": 1100,
+            "close_price": 1000,
+            "volume": 50000,
+        },
+        {
+            "symbol": "FOLD",
+            "last_price": 1020,
+            "close_price": 1000,
+            "volume": 30000,
+        },
+    ]
+
+    result = service.filter_price_change(results, 5)
+
+    assert len(result) == 1
+    assert result[0]["symbol"] == "NOURI"
+    assert result[0]["price_change_percent"] == 10
