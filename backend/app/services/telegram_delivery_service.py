@@ -1,7 +1,8 @@
 class TelegramDeliveryService:
     def send_chart(self, chart_data: dict) -> dict:
         return {
-            "status": "ready",
+            "symbol": chart_data["symbol"],
             "type": "telegram_chart",
+            "status": "ready",
             "data": chart_data,
         }
