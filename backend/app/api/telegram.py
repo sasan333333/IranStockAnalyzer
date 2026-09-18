@@ -28,14 +28,16 @@ def telegram_command(command: str):
 
 @router.post("/telegram/webhook")
 def telegram_webhook(update: dict):
-    message = update.get("message", {})
-    text = message.get("text", "")
+    message = update.get("message") or {}
+    text = message.get("text")
 
-    if not text:
+    if not isinstance(text, str) or not text.strip():
         return {
             "status": "ignored",
             "response": None,
         }
+
+    text = text.strip()
 
     return {
         "status": "processed",
