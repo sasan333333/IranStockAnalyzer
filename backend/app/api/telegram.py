@@ -24,3 +24,11 @@ def telegram_command(command: str):
     return {
         "response": command_service.handle(command)
     }
+
+
+@router.post("/telegram/webhook")
+def telegram_webhook(update: dict):
+    return {
+        "status": "received",
+        "update": update,
+    }
