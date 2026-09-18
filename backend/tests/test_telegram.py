@@ -56,7 +56,9 @@ def test_telegram_chart_command(monkeypatch):
     assert data["symbol"] == "NOURI"
     assert data["type"] == "telegram_chart"
     assert data["status"] == "ready"
+    assert data["data"]["symbol"] == "NOURI"
     assert data["data"]["type"] == "market_history_chart"
+    assert data["data"]["status"] == "requested"
     assert data["data"]["data"] == fake_history
 
 
