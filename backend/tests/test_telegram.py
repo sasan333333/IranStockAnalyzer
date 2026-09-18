@@ -111,3 +111,39 @@ def test_telegram_webhook_empty_message():
 
     assert data["status"] == "ignored"
     assert data["response"] is None
+
+
+def test_telegram_webhook_blank_message():
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {
+                "text": "   "
+            }
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "ignored"
+    assert data["response"] is None
+
+
+def test_telegram_webhook_unknown_command():
+    response = client.post(
+        "/telegram/webhook",
+        json={
+            "message": {
+                "text": "   /unknown   "
+            }
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["status"] == "processed"
+    assert data["response"] == "Unknown command"
