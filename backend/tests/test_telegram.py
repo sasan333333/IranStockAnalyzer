@@ -24,3 +24,15 @@ def test_telegram_help_command():
 
     assert response.status_code == 200
     assert "Commands:" in response.json()["response"]
+
+
+def test_telegram_chart_command():
+    response = client.get("/telegram/command/%2Fchart%20NOURI")
+
+    assert response.status_code == 200
+
+    data = response.json()["response"]
+
+    assert data["symbol"] == "NOURI"
+    assert data["type"] == "market_history_chart"
+    assert data["status"] == "requested"
