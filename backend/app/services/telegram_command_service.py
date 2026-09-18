@@ -1,11 +1,13 @@
 from app.services.market_data_service import MarketDataService
+from app.services.telegram_chart_service import TelegramChartService
 
 
 class TelegramCommandService:
     def __init__(self):
         self.market_data_service = MarketDataService()
+        self.chart_service = TelegramChartService()
 
-    def handle(self, command: str) -> str:
+    def handle(self, command: str):
         if command == "/start":
             return "IranStockAnalyzer Bot"
 
@@ -33,6 +35,6 @@ class TelegramCommandService:
             if not symbol:
                 return "Symbol is required"
 
-            return f"Chart requested for {symbol}"
+            return self.chart_service.build_chart_request(symbol)
 
         return "Unknown command"
